@@ -4,13 +4,17 @@
 
 **Blocked by:** None (can start immediately).
 
-**Status:** ready-for-agent
+**Status:** done
 
 ## Acceptance criteria
 
-- [ ] `/` is a Landing: short pitch, how the duel works, one control to enter the Arena
-- [ ] Entering the Arena navigates to a dedicated Arena route (stub content is OK)
-- [ ] TypeScript Next.js App Router app with `AI_GATEWAY_API_KEY` in `.env.example` only (empty value)
-- [ ] `typecheck`, lint, and production build succeed
-- [ ] MIT license; README names JevArena and that Jev is reached through Vercel AI Gateway
-- [ ] Original code; do not copy the reference repo
+- [x] `/` is a Landing: short pitch, how the duel works, one control to enter the Arena
+- [x] Entering the Arena navigates to a dedicated Arena route (stub content is OK)
+- [x] TypeScript Next.js App Router app with `AI_GATEWAY_API_KEY` in `.env.example` only (empty value)
+- [x] `typecheck`, lint, and production build succeed
+- [x] MIT license; README names JevArena and that Jev is reached through Vercel AI Gateway
+- [x] Original code; do not copy the reference repo
+
+## Comments
+
+Landing at `/` with pitch + how the duel works + Enter the Arena → `/arena` stub. Vitest covers that path. `typecheck`, lint, and production build pass. Tickets 02–05 not started.
