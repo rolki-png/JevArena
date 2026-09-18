@@ -12,9 +12,11 @@ cp .env.example .env.local
 npm run dev
 ```
 
-Open [http://127.0.0.1:43123](http://127.0.0.1:43123). The Landing explains the Match; **Enter the Arena** opens `/arena`.
+Open [http://127.0.0.1:43123](http://127.0.0.1:43123). The Landing explains the Match; **Enter the Arena** opens `/arena` with two isolated Snake Browsers.
 
-`AI_GATEWAY_API_KEY` is the only credential. Copy `.env.example` to `.env.local` and leave the value empty until you have a Gateway key. Never commit `.env.local`.
+`AI_GATEWAY_API_KEY` is the only credential. Copy `.env.example` to `.env.local` and leave the value empty to watch a labeled Demo policy Match. Set the key to drive both Agents with Jev through Vercel AI Gateway. Never commit `.env.local`. The key stays on the server.
+
+If Jev fails, that Agent is BLOCKED. The Demo policy does not run in that case.
 
 ## Scripts
 

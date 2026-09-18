@@ -4,13 +4,17 @@
 
 **Blocked by:** 04 — Gateway Jev
 
-**Status:** ready-for-agent
+**Status:** done
 
 ## Acceptance criteria
 
-- [ ] Per-tick timeline records each Agent's operation, target, score, and alive/BLOCKED state
-- [ ] Event log lists Click, Wait, BLOCKED, Crash, and score events for both Agents
-- [ ] Click flash is visible on the board region and the chosen direction button
-- [ ] Browser chrome reads as two distinct Agents (name, model source Demo vs Jev, latency)
-- [ ] Layout remains usable stacked on a narrow viewport
-- [ ] Landing copy still matches the finished Arena
+- [x] Per-tick timeline records each Agent's operation, target, score, and alive/BLOCKED state
+- [x] Event log lists Click, Wait, BLOCKED, Crash, and score events for both Agents
+- [x] Click flash is visible on the board region and the chosen direction button
+- [x] Browser chrome reads as two distinct Agents (name, model source Demo vs Jev, latency)
+- [x] Layout remains usable stacked on a narrow viewport
+- [x] Landing copy still matches the finished Arena
+
+## Comments
+
+Arena chrome includes timeline, event log, Agent panes (Demo policy vs Jev, latency, probabilities), and Click flash inside each Browser.

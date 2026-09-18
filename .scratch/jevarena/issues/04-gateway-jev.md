@@ -4,13 +4,17 @@
 
 **Blocked by:** 03 — Demo Match
 
-**Status:** ready-for-agent
+**Status:** done
 
 ## Acceptance criteria
 
-- [ ] With a key, Agent-step calls `experimental_evaluate` on `typesafe-ai/jev` (choice: operation and click target)
-- [ ] Without a key, behaviour stays Demo policy and labeled
-- [ ] Evaluate throw/timeout → BLOCKED for that Agent, Demo policy does not run, UI shows BLOCKED not Crash
-- [ ] Returned probabilities, confidence (when present), and latency are visible on the Agent pane
-- [ ] Adapter tests use a fake evaluate; CI does not call live Gateway
-- [ ] Key is server-only; no TypeSafe SDK
+- [x] With a key, Agent-step calls `experimental_evaluate` on `typesafe-ai/jev` (choice: operation and click target)
+- [x] Without a key, behaviour stays Demo policy and labeled
+- [x] Evaluate throw/timeout → BLOCKED for that Agent, Demo policy does not run, UI shows BLOCKED not Crash
+- [x] Returned probabilities, confidence (when present), and latency are visible on the Agent pane
+- [x] Adapter tests use a fake evaluate; CI does not call live Gateway
+- [x] Key is server-only; no TypeSafe SDK
+
+## Comments
+
+`POST /api/agent-step` stays on the server. Adapter tests inject a fake evaluate. Thrown evaluate maps to BLOCKED with source `blocked`.
