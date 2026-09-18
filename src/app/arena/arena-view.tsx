@@ -339,8 +339,8 @@ export function ArenaView() {
         />
       </section>
 
-      <section className="grid gap-4 lg:grid-cols-[1.2fr_0.8fr]">
-        <div className="rounded-2xl border border-border bg-card/60 p-4">
+      <section className="grid min-w-0 gap-4 lg:grid-cols-2">
+        <div className="min-w-0 overflow-hidden rounded-2xl border border-border bg-card/60 p-4">
           <h2 className="mb-3 text-sm font-medium">Per-tick timeline</h2>
           <div className="flex gap-1 overflow-x-auto pb-2">
             {timeline.length === 0 ? (
@@ -384,7 +384,7 @@ export function ArenaView() {
             </ul>
           ) : null}
         </div>
-        <div className="rounded-2xl border border-border bg-card/60 p-4">
+        <div className="min-w-0 overflow-hidden rounded-2xl border border-border bg-card/60 p-4">
           <h2 className="mb-3 text-sm font-medium">Event log</h2>
           <ol className="max-h-56 space-y-1 overflow-y-auto font-mono text-xs">
             {events.length === 0 ? (
