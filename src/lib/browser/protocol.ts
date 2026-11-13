@@ -24,5 +24,14 @@ export type BrowserHaltMessage = {
   generation: number;
 };
 
+export type BrowserStepMessage = {
+  protocol: typeof BROWSER_PROTOCOL;
+  kind: "step";
+  generation: number;
+};
+
 export type BrowserToParent = BrowserSnapshotMessage;
-export type ParentToBrowser = BrowserClickMessage | BrowserHaltMessage;
+export type ParentToBrowser =
+  | BrowserClickMessage
+  | BrowserStepMessage
+  | BrowserHaltMessage;

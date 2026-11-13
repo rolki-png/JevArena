@@ -7,7 +7,7 @@ import {
   offeredElements,
   step,
 } from "@/lib/snake/engine";
-import { ID_TO_DIRECTION, STEP_MS } from "@/lib/snake/constants";
+import { ID_TO_DIRECTION } from "@/lib/snake/constants";
 import type { SnakeState } from "@/lib/snake/types";
 import { toSnapshot } from "@/lib/match/orchestrator";
 import {
@@ -39,7 +39,9 @@ export function SnakeBrowser({
   const [state, setState] = useState(() => createSnake({ seed }));
   const [flashId, setFlashId] = useState<string | null>(null);
   const [boardFlash, setBoardFlash] = useState(false);
+  const stateRef = useRef(state);
   const tickRef = useRef(0);
+  const publishedRef = useRef<string | null>(null);
   const runningRef = useRef(true);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -69,27 +71,21 @@ export function SnakeBrowser({
     setBoardFlash(true);
     window.setTimeout(() => setFlashId(null), 180);
     window.setTimeout(() => setBoardFlash(false), 180);
-    setState((current) => {
-      const offered = offeredElements(current);
-      if (!offered.some((el) => el.id === elementId)) return current;
-      return applyClick(current, direction);
-    });
+    const current = stateRef.current;
+    if (!offeredElements(current).some((el) => el.id === elementId)) return;
+    const next = applyClick(current, direction);
+    stateRef.current = next;
+    setState(next);
   }, []);
 
   useEffect(() => {
     runningRef.current = true;
+    // Strict Mode runs effects twice in development; a second publish would
+    // start a second step chain and double the snake's speed.
+    const key = `${generation}:${seed}`;
+    if (publishedRef.current === key) return;
+    publishedRef.current = key;
     publish(createSnake({ seed }));
-    const id = window.setInterval(() => {
-      if (!runningRef.current) return;
-      setState((current) => {
-        if (!current.alive) return current;
-        const next = step(current);
-        tickRef.current += 1;
-        publish(next);
-        return next;
-      });
-    }, STEP_MS);
-    return () => window.clearInterval(id);
   }, [publish, seed, generation]);
 
   useEffect(() => {
@@ -102,6 +98,19 @@ export function SnakeBrowser({
         runningRef.current = false;
         return;
       }
+      if (data.kind === "step") {
+        // The Arena drives ticks: step only once it has applied or resolved
+        // the decision for the previous snapshot.
+        if (!runningRef.current) return;
+        const current = stateRef.current;
+        if (!current.alive) return;
+        const next = step(current);
+        stateRef.current = next;
+        tickRef.current += 1;
+        setState(next);
+        publish(next);
+        return;
+      }
       if (data.kind === "click") {
         const button = document.querySelector<HTMLButtonElement>(
           `[data-element-id="${data.elementId}"]`,
@@ -111,7 +120,7 @@ export function SnakeBrowser({
     }
     window.addEventListener("message", onMessage);
     return () => window.removeEventListener("message", onMessage);
-  }, [generation]);
+  }, [generation, publish]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
