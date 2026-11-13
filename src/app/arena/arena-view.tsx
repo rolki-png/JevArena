@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { AgentPane } from "@/app/arena/agent-pane";
 import { buttonVariants } from "@/components/ui/button";
-import { MATCH_MS } from "@/lib/snake/constants";
+import { MATCH_MS, STEP_MS } from "@/lib/snake/constants";
 import type { AgentDecision } from "@/lib/agent/types";
 import type { AgentId, MatchEvent, MatchResult, TickEntry } from "@/lib/match/orchestrator";
 import {
@@ -73,10 +73,24 @@ export function ArenaView() {
     [halt],
   );
 
+  // Ticks are driven from here. STEP_MS is the minimum time between a Browser's
+  // ticks, not a deadline for the decision. The Match clock is wall time, so a
+  // slow Jev uses up Match time but never causes a Crash by itself.
+  const sendStep = useCallback((agent: AgentId, gen: number, sentAt: number) => {
+    const wait = Math.max(0, STEP_MS - (Date.now() - sentAt));
+    window.setTimeout(() => {
+      if (!runningRef.current || generationRef.current !== gen) return;
+      iframeRefs.current[agent]?.contentWindow?.postMessage(
+        { protocol: BROWSER_PROTOCOL, kind: "step", generation: gen },
+        window.location.origin,
+      );
+    }, wait);
+  }, []);
+
   const requestDecision = useCallback(
     async (agent: AgentId, snapshot: BrowserSnapshotMessage["snapshot"], tick: number, gen: number) => {
       if (!runningRef.current || generationRef.current !== gen) return;
-      inflight.current[agent]?.abort();
+      const requestedAt = Date.now();
       const controller = new AbortController();
       inflight.current[agent] = controller;
       try {
@@ -142,6 +156,7 @@ export function ArenaView() {
             window.location.origin,
           );
         }
+        sendStep(agent, gen, requestedAt);
       } catch (error) {
         if (controller.signal.aborted) return;
         if (generationRef.current !== gen || !runningRef.current) return;
@@ -151,9 +166,10 @@ export function ArenaView() {
         }));
         setBlocked((current) => ({ ...current, [agent]: true }));
         void error;
+        sendStep(agent, gen, requestedAt);
       }
     },
-    [],
+    [sendStep],
   );
 
   useEffect(() => {

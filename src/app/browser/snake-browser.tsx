@@ -7,7 +7,7 @@ import {
   offeredElements,
   step,
 } from "@/lib/snake/engine";
-import { ID_TO_DIRECTION, STEP_MS } from "@/lib/snake/constants";
+import { ID_TO_DIRECTION } from "@/lib/snake/constants";
 import type { SnakeState } from "@/lib/snake/types";
 import { toSnapshot } from "@/lib/match/orchestrator";
 import {
@@ -79,17 +79,6 @@ export function SnakeBrowser({
   useEffect(() => {
     runningRef.current = true;
     publish(createSnake({ seed }));
-    const id = window.setInterval(() => {
-      if (!runningRef.current) return;
-      setState((current) => {
-        if (!current.alive) return current;
-        const next = step(current);
-        tickRef.current += 1;
-        publish(next);
-        return next;
-      });
-    }, STEP_MS);
-    return () => window.clearInterval(id);
   }, [publish, seed, generation]);
 
   useEffect(() => {
@@ -102,6 +91,19 @@ export function SnakeBrowser({
         runningRef.current = false;
         return;
       }
+      if (data.kind === "step") {
+        // The Arena drives ticks: step only once it has applied or resolved
+        // the decision for the previous snapshot.
+        if (!runningRef.current) return;
+        setState((current) => {
+          if (!current.alive) return current;
+          const next = step(current);
+          tickRef.current += 1;
+          publish(next);
+          return next;
+        });
+        return;
+      }
       if (data.kind === "click") {
         const button = document.querySelector<HTMLButtonElement>(
           `[data-element-id="${data.elementId}"]`,
@@ -111,7 +113,7 @@ export function SnakeBrowser({
     }
     window.addEventListener("message", onMessage);
     return () => window.removeEventListener("message", onMessage);
-  }, [generation]);
+  }, [generation, publish]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
